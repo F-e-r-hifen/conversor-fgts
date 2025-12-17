@@ -257,21 +257,28 @@ if uploaded_file is not None:
                 with col2:
                     st.metric("Empréstimos", total_emprestimos)
                 with col3:
-                    st.metric("Valor Total", f"R$ {total_valor:,.2f}")
-                with col4:
                     st.metric("Instituições", instituicoes_unicas)
+                with col4:
+                    st.metric("Valor Total", f"R$ {total_valor:,.2f}")
 
                 # Botão de download
                 st.markdown("---")
                 timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
                 nome_arquivo = f"FGTS_Trabalhadores_{timestamp}.xlsx"
 
-                st.download_button(
-                    label="⬇️ BAIXAR EXCEL",
-                    data=excel_bytes,
-                    file_name=nome_arquivo,
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                col_download, col_reiniciar = st.columns([2, 1])
+
+                with col_download:
+                    st.download_button(
+                        label="⬇️ BAIXAR EXCEL",
+                        data=excel_bytes,
+                        file_name=nome_arquivo,
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
+                with col_reiniciar:
+                    if st.button("🔄 NOVO ARQUIVO", key="reiniciar"):
+                        st.rerun()
 
                 st.success(f"💾 Arquivo pronto: {nome_arquivo}")
 
@@ -283,6 +290,11 @@ st.markdown("""
 <div style="text-align: center; color: #666; padding: 20px;">
     <p>🔒 Seus dados são processados localmente e não são armazenados</p>
     <p style="font-size: 12px;">Conversor E-Consigando v2.0 - 100% de precisão</p>
-    <p style="font-size: 12px;">Para dúvidas, sugestões e pedidos: fer.jobs01@gmail.com</p>
+    <div style="margin-top: 15px; padding: 12px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+        <p style="font-size: 14px; color: #495057; margin: 0;">
+            📧 <strong>Suporte:</strong> Para dúvidas, sugestões e pedidos entre em contato:<br>
+            <a href="mailto:fer.jobs01@gmail.com" style="color: #1f77b4; text-decoration: none; font-weight: bold;">fer.jobs01@gmail.com</a>
+        </p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
