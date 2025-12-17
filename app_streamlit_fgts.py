@@ -96,7 +96,7 @@ st.markdown("""
 # ====
 st.markdown("""
 <div class="main-header">
-    <h1>📄 Conversor FGTS</h1>
+    <h1>📄 Conversor Consignado (PDF to Excel)</h1>
     <p style="font-size: 18px; margin: 0;">Converta o detalhamento de empréstimos em planilhas Excel automaticamente</p>
 </div>
 """, unsafe_allow_html=True)
