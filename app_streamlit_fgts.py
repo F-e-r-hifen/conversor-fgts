@@ -191,6 +191,24 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Inicializar session_state
+if 'mostrar_resultado' not in st.session_state:
+    st.session_state.mostrar_resultado = False
+if 'excel_bytes' not in st.session_state:
+    st.session_state.excel_bytes = None
+if 'df' not in st.session_state:
+    st.session_state.df = None
+if 'nome_arquivo' not in st.session_state:
+    st.session_state.nome_arquivo = None
+if 'trabalhadores_unicos' not in st.session_state:
+    st.session_state.trabalhadores_unicos = 0
+if 'total_emprestimos' not in st.session_state:
+    st.session_state.total_emprestimos = 0
+if 'total_valor' not in st.session_state:
+    st.session_state.total_valor = 0
+if 'instituicoes_unicas' not in st.session_state:
+    st.session_state.instituicoes_unicas = 0
+
 # Upload do arquivo
 uploaded_file = st.file_uploader(
     "📤 Selecione o arquivo PDF do detalhamento de guia consignado",
@@ -235,7 +253,121 @@ if uploaded_file is not None:
                 total_valor = df['Valor Consignado na Guia'].str.replace(',', '.').astype(float).sum()
                 instituicoes_unicas = df['Instituição Financeira'].nunique()
 
-                # Mensagem de sucesso
+                # Salvar no session_state
+                st.session_state.mostrar_resultado = True
+                st.session_state.excel_bytes = excel_bytes
+                st.session_state.df = df
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+                st.session_state.nome_arquivo = f"FGTS_Trabalhadores_{timestamp}.xlsx"
+                st.session_state.trabalhadores_unicos = trabalhadores_unicos
+                st.session_state.total_emprestimos = total_emprestimos
+                st.session_state.total_valor = total_valor
+                st.session_state.instituicoes_unicas = instituicoes_unicas
+
+# Mostrar resultado se existir no session_state
+if st.session_state.mostrar_resultado:
+    # Mensagem de sucesso
+    st.markdown(f"""
+    <div class="success-box">
+        <h3>✅ Conversão concluída com sucesso!</h3>
+        <p style="font-size: 18px; margin: 10px 0;">
+            <strong>{st.session_state.trabalhadores_unicos} trabalhadores</strong> com <strong>{st.session_state.total_emprestimos} empréstimos</strong> extraídos do PDF
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Preview dos dados
+    st.subheader("👀 Prévia dos dados (primeiros 20 registros)")
+    st.dataframe(st.session_state.df.head(20), use_container_width=True)
+
+    # Estatísticas
+    st.subheader("📊 Estatísticas")
+
+    # Primeira linha - 3 colunas
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Trabalhadores", st.session_state.trabalhadores_unicos)
+    with col2:
+        st.metric("Empréstimos", st.session_state.total_emprestimos)
+    with col3:
+        st.metric("Instituições", st.session_state.instituicoes_unicas)
+
+    # Segunda linha - Valor Total com espaço completo
+    st.metric("💰 Valor Total Consignado", f"R$ {st.session_state.total_valor:,.2f}")
+
+    # Botão de download
+    st.markdown("---")
+
+    col_download, col_reiniciar = st.columns(2)
+
+    with col_download:
+        st.download_button(
+            label="⬇️ BAIXAR EXCEL",
+            data=st.session_state.excel_bytes,
+            file_name=st.session_state.nome_arquivo,
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+    with col_reiniciar:
+        if st.button("🔄 NOVO ARQUIVO", key="reiniciar"):
+            # Limpar session_state
+            st.session_state.mostrar_resultado = False
+            st.session_state.excel_bytes = None
+            st.session_state.df = None
+            st.session_state.nome_arquivo = None
+            st.rerun()
+
+    st.success(f"💾 Arquivo pronto: {st.session_state.nome_arquivo}")
+else:
+    if uploaded_file is not None:
+        st.markdown("---")
+
+        # Informações do arquivo
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("📄 Arquivo", uploaded_file.name)
+        with col2:
+            tamanho_mb = uploaded_file.size / (1024 * 1024)
+            st.metric("📏 Tamanho", f"{tamanho_mb:.2f} MB")
+
+        st.markdown("---")
+
+        # Botão de conversão (movido para cá)
+        if st.button("🚀 CONVERTER PARA EXCEL"):
+            with st.spinner("⏳ Processando PDF... Por favor, aguarde."):
+                # Ler bytes do arquivo
+                pdf_bytes = uploaded_file.read()
+
+                # Extrair dados
+                workers, error = extrair_trabalhadores_pdf(pdf_bytes)
+
+                if error:
+                    st.error(f"❌ Erro ao processar PDF: {error}")
+                elif not workers:
+                    st.warning("⚠️ Nenhum trabalhador encontrado no PDF. Verifique o formato do arquivo.")
+                else:
+                    # Gerar Excel
+                    excel_bytes, df = gerar_excel(workers)
+
+                    # Calcular estatísticas
+                    trabalhadores_unicos = df['CPF'].nunique()
+                    total_emprestimos = len(df)
+                    total_valor = df['Valor Consignado na Guia'].str.replace(',', '.').astype(float).sum()
+                    instituicoes_unicas = df['Instituição Financeira'].nunique()
+
+                    # Salvar no session_state
+                    st.session_state.mostrar_resultado = True
+                    st.session_state.excel_bytes = excel_bytes
+                    st.session_state.df = df
+                    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+                    st.session_state.nome_arquivo = f"FGTS_Trabalhadores_{timestamp}.xlsx"
+                    st.session_state.trabalhadores_unicos = trabalhadores_unicos
+                    st.session_state.total_emprestimos = total_emprestimos
+                    st.session_state.total_valor = total_valor
+                    st.session_state.instituicoes_unicas = instituicoes_unicas
+                    st.rerun()
+
+
                 st.markdown(f"""
                 <div class="success-box">
                     <h3>✅ Conversão concluída com sucesso!</h3>
@@ -251,22 +383,25 @@ if uploaded_file is not None:
 
                 # Estatísticas
                 st.subheader("📊 Estatísticas")
-                col1, col2, col3, col4 = st.columns(4)
+
+                # Primeira linha - 3 colunas
+                col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("Trabalhadores", trabalhadores_unicos)
                 with col2:
                     st.metric("Empréstimos", total_emprestimos)
                 with col3:
                     st.metric("Instituições", instituicoes_unicas)
-                with col4:
-                    st.metric("Valor Total", f"R$ {total_valor:,.2f}")
+
+                # Segunda linha - Valor Total com espaço completo
+                st.metric("💰 Valor Total Consignado", f"R$ {total_valor:,.2f}")
 
                 # Botão de download
                 st.markdown("---")
                 timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
                 nome_arquivo = f"FGTS_Trabalhadores_{timestamp}.xlsx"
 
-                col_download, col_reiniciar = st.columns([2, 1])
+                col_download, col_reiniciar = st.columns(2)
 
                 with col_download:
                     st.download_button(
