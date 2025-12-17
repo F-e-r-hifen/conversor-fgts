@@ -59,6 +59,35 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #155a8a;
     }
+
+    /* Estilo para botões de download e reiniciar */
+    .stDownloadButton>button {
+        width: 100%;
+        background-color: #28a745 !important;
+        color: white !important;
+        font-size: 18px !important;
+        padding: 15px !important;
+        border-radius: 10px !important;
+        border: none !important;
+        font-weight: bold !important;
+        height: 60px !important;
+        line-height: 30px !important;
+    }
+
+    .stDownloadButton>button:hover {
+        background-color: #218838 !important;
+    }
+
+    /* Botão NOVO ARQUIVO com cor azul */
+    div[data-testid="column"]:nth-child(2) .stButton>button {
+        background-color: #1f77b4 !important;
+        height: 60px !important;
+        line-height: 30px !important;
+    }
+
+    div[data-testid="column"]:nth-child(2) .stButton>button:hover {
+        background-color: #155a8a !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
