@@ -10,18 +10,18 @@ import re
 import io
 from datetime import datetime
 
-# ============================================================================
+# ====
 # CONFIGURAÇÃO DA PÁGINA
-# ============================================================================
+# ====
 st.set_page_config(
     page_title="Conversor de detalhamento de GUIA e-consignado",
     page_icon="📄",
     layout="centered"
 )
 
-# ============================================================================
+# ====
 # ESTILO CSS
-# ============================================================================
+# ====
 st.markdown("""
 <style>
     .main-header {
@@ -62,9 +62,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================================
+# ====
 # CABEÇALHO
-# ============================================================================
+# ====
 st.markdown("""
 <div class="main-header">
     <h1>📄 Conversor FGTS</h1>
@@ -72,9 +72,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ============================================================================
+# ====
 # FUNÇÃO DE EXTRAÇÃO
-# ============================================================================
+# ====
 @st.cache_data
 def extrair_trabalhadores_pdf(pdf_bytes):
     """Extrai todos os trabalhadores da listagem em PDF"""
@@ -144,9 +144,9 @@ def extrair_trabalhadores_pdf(pdf_bytes):
     except Exception as e:
         return [], str(e)
 
-# ============================================================================
+# ====
 # FUNÇÃO PARA GERAR EXCEL
-# ============================================================================
+# ====
 def gerar_excel(workers):
     """Gera arquivo Excel com os dados"""
     df = pd.DataFrame(workers)
@@ -174,9 +174,9 @@ def gerar_excel(workers):
 
     return output.getvalue(), df
 
-# ============================================================================
+# ====
 # INTERFACE PRINCIPAL
-# ============================================================================
+# ====
 
 # Instruções
 st.markdown("""
@@ -229,12 +229,18 @@ if uploaded_file is not None:
                 # Gerar Excel
                 excel_bytes, df = gerar_excel(workers)
 
+                # Calcular estatísticas
+                trabalhadores_unicos = df['CPF'].nunique()
+                total_emprestimos = len(df)
+                total_valor = df['Valor Consignado na Guia'].str.replace(',', '.').astype(float).sum()
+                instituicoes_unicas = df['Instituição Financeira'].nunique()
+
                 # Mensagem de sucesso
                 st.markdown(f"""
                 <div class="success-box">
                     <h3>✅ Conversão concluída com sucesso!</h3>
                     <p style="font-size: 18px; margin: 10px 0;">
-                        <strong>{len(workers)} trabalhadores</strong> extraídos do PDF
+                        <strong>{trabalhadores_unicos} trabalhadores</strong> com <strong>{total_emprestimos} empréstimos</strong> extraídos do PDF
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -251,10 +257,8 @@ if uploaded_file is not None:
                 with col2:
                     st.metric("Empréstimos", total_emprestimos)
                 with col3:
-                    total_valor = df['Valor Consignado na Guia'].str.replace(',', '.').astype(float).sum()
                     st.metric("Valor Total", f"R$ {total_valor:,.2f}")
                 with col4:
-                    instituicoes_unicas = df['Instituição Financeira'].nunique()
                     st.metric("Instituições", instituicoes_unicas)
 
                 # Botão de download
@@ -271,9 +275,9 @@ if uploaded_file is not None:
 
                 st.success(f"💾 Arquivo pronto: {nome_arquivo}")
 
-# ============================================================================
+# ====
 # RODAPÉ
-# ============================================================================
+# ====
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #666; padding: 20px;">
