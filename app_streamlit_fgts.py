@@ -276,6 +276,7 @@ st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #666; padding: 20px;">
     <p>🔒 Seus dados são processados localmente e não são armazenados</p>
-    <p style="font-size: 12px;">Conversor FGTS v2.0 - 100% de precisão</p>
+    <p style="font-size: 12px;">Conversor E-Consigando v2.0 - 100% de precisão</p>
+    <p style="font-size: 12px;">Para dúvidas, sugestões e pedidos: fer.jobs01@gmail.com</p>
 </div>
 """, unsafe_allow_html=True)
