@@ -14,7 +14,7 @@ from datetime import datetime
 # CONFIGURAÇÃO DA PÁGINA
 # ============================================================================
 st.set_page_config(
-    page_title="Conversor FGTS",
+    page_title="Conversor de detalhamento de GUIA e-consignado",
     page_icon="📄",
     layout="centered"
 )
@@ -193,7 +193,7 @@ st.markdown("""
 
 # Upload do arquivo
 uploaded_file = st.file_uploader(
-    "📤 Selecione o arquivo PDF da guia FGTS",
+    "📤 Selecione o arquivo PDF do detalhamento de guia consignado",
     type=['pdf'],
     help="Faça upload do arquivo 'Detalhe da Guia Emitida.pdf'"
 )
