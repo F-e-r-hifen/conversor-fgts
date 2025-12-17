@@ -68,7 +68,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>📄 Conversor FGTS</h1>
-    <p style="font-size: 18px; margin: 0;">Converta guias PDF em planilhas Excel automaticamente</p>
+    <p style="font-size: 18px; margin: 0;">Converta o detalhamento de empréstimos em planilhas Excel automaticamente</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -77,7 +77,7 @@ st.markdown("""
 # ============================================================================
 @st.cache_data
 def extrair_trabalhadores_pdf(pdf_bytes):
-    """Extrai todos os trabalhadores do PDF FGTS"""
+    """Extrai todos os trabalhadores da listagem em PDF"""
     all_workers = []
     cpf_pattern = re.compile(r'\d{3}\.\d{3}\.\d{3}-\d{2}')
 
