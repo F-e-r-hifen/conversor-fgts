@@ -134,7 +134,7 @@ def extrair_trabalhadores_pdf(pdf_bytes):
             # Atualizar progresso
             progress = (page_num + 1) / total_pages
             progress_bar.progress(progress)
-            status_text.text(f"Processando página {page_num + 1} de {total_pages}... ({len(all_workers)} trabalhadores)")
+            status_text.text(f"Processando página {page_num + 1} de {total_pages}... ({len(all_workers)} empréstimos)")
 
         progress_bar.empty()
         status_text.empty()
@@ -245,13 +245,15 @@ if uploaded_file is not None:
 
                 # Estatísticas
                 st.subheader("📊 Estatísticas")
-                col1, col2, col3 = st.columns(3)
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("Total de Trabalhadores", len(workers))
+                    st.metric("Trabalhadores", trabalhadores_unicos)
                 with col2:
+                    st.metric("Empréstimos", total_emprestimos)
+                with col3:
                     total_valor = df['Valor Consignado na Guia'].str.replace(',', '.').astype(float).sum()
                     st.metric("Valor Total", f"R$ {total_valor:,.2f}")
-                with col3:
+                with col4:
                     instituicoes_unicas = df['Instituição Financeira'].nunique()
                     st.metric("Instituições", instituicoes_unicas)
 
